@@ -1,0 +1,363 @@
+// for first visit
+var arrayOfObjects = [
+  { name: "Okonomiyaki", inIt: "pork, flour, water" },
+  {
+    name: "chili",
+    inIt: "pork, beans, tomatoes, onions, garlic, spicy peppers"
+  },
+  { name: "HamSandwich", inIt: "ham, bread" }
+];
+var z = 100;
+var ob = arrayOfObjects;
+//convert array to string prior to local storage
+const stringIt = arr => {
+  let jas = JSON.stringify(arr);
+  return jas;
+};
+//convert string back to array for mapping
+const arrIt = str => {
+  let jas = JSON.parse(str);
+  return jas;
+};
+// check for previous visits if first visit plug in sample recipies
+if (!localStorage.Recipies) {
+  localStorage.Recipies = stringIt(ob);
+}
+
+
+class EditRecButton extends React.Component {
+  constructor(props) {
+    super();
+  }
+  render() {
+    return (
+      <button
+        className="btn btn-success"
+        data-toggle="modal"
+        data-target="#myModal3"
+      >
+        Edit A Recipe
+      </button>
+    );
+  }
+}
+class EditForm extends React.Component {
+  constructor(props) {
+    super();
+  }
+  edit(id) {
+    // console.log(id);
+    this.props.editor(id);
+  }
+  render() {
+    let gen = this.props.reci.map(data => (
+      <div>
+        {" "}
+        <button
+          data-dismiss="modal"
+          className="btn btn-success"
+          key={data.name}
+          id={data.name}
+          onClick={() => this.edit(data.name)}
+        >
+          Edit {data.name}
+        </button>
+        {" "}
+      </div>
+    ));
+    return <div>{gen}</div>;
+  }
+}
+class DeleteButtons extends React.Component {
+  constructor(props) {
+    super();
+  }
+  remove(id) {
+    // console.log(id);
+    this.props.removeRec(id);
+  }
+  render() {
+    let gen = this.props.reci.map(data => (
+      <div>
+        {" "}
+        <button
+          data-dismiss="modal"
+          className="btn btn-danger"
+          key={data.name}
+          id={data.name}
+          onClick={() => this.remove(data.name)}
+        >
+          Delete {data.name}
+        </button>
+        {" "}
+      </div>
+    ));
+    return <div>{gen}</div>;
+  }
+}
+class Credits extends React.Component {
+  constructor(props) {
+    super();
+  }
+  render() {
+    return( <div className="credit">
+    <h5>built by <br />Tom Landis <br />in<strong><a> React.js</a></strong> </h5></div>)
+  }
+}
+
+class App extends React.Component {
+  constructor(props) {
+    super();
+    this._addRec = this._addRec.bind(this);
+    this._delRec = this._delRec.bind(this);
+    this.editor = this.editor.bind(this);
+    let trans = localStorage.Recipies;
+    trans = arrIt(trans);
+    this.state = { data: trans };
+  }
+  editor(id) {
+    let grab = this.state.data;
+    let ingred;
+
+    for (let i = 0; i < grab.length; i++) {
+      if (grab[i].name === id) {
+        ingred = grab[i].inIt;
+      }
+    }
+
+    this._delRec(id);
+    recTitle.value = id;
+    recIngred.value = ingred;
+    newR.click();
+  }
+  _addRec() {
+    let item = recTitle.value;
+    let inside = recIngred.value;
+   
+    let newData = [];
+     //this regEx is here to fix a problem with the accordian not being openable if the title has spaces
+      let str = item.replace(/\s+/g, '');
+      str = str.replace(/[0-9]/g, '');
+
+    if (
+      str == "" ||
+      inside == "" ||
+      inside == undefined ||
+      str == undefined
+    ) {
+      alert("The Cook is only as good as the instructions he is given!!!");
+      return;
+    } else {
+     
+      let newRec = { name: str, inIt: inside };
+      newData = this.state.data;
+      newData.push(newRec);
+      recTitle.value = "";
+      recIngred.value = "";
+      this.setState({ data: newData });
+      let trans = stringIt(newData);
+
+      localStorage.Recipies = trans;
+    }
+  }
+  _delRec(id) {
+    let filter = this.state.data;
+    let yes = [];
+
+    for (let i = 0; i < filter.length; i++) {
+      if (filter[i].name !== id) {
+        yes.push(filter[i]);
+      }
+    }
+  
+    this.setState({ data: yes });
+    let trans = stringIt(yes);
+    localStorage.Recipies = trans;
+  }
+
+  render() {
+    let reci = this.state.data;
+    let dishes = reci.map(data => data.name);
+
+    return (
+      <div>
+        <h2>My Favorite Recipies</h2>
+        <button
+          id="newR"
+          className="btn btn-primary"
+          data-toggle="modal"
+          data-target="#myModal"
+        >
+          NEW RECIPE{" "}
+        </button>
+        <EditRecButton />
+        <div
+          className="modal fade"
+          id="myModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myModalLabel"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                  onClick={this._addRec}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 className="modal-title" id="myModalLabel">Recipe for...</h4>
+                <input type="text" id="recTitle" />
+              </div>
+              <div className="modal-body">
+                Ingredients: <input type="text" id="recIngred" />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal"
+                  onClick={this._addRec}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={this._addRec}
+                  data-dismiss="modal"
+                >
+                  Save Recipe
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="accordion" role="tablist" aria-multiselectable="true">
+          {reci.map(data => (
+            
+            <div className="card">
+              <div className="card-header" role="tab" id={data.index}>
+                <p className="mb-0">
+                  <a
+                    data-toggle="collapse"
+                    data-parent={"#" + data.index}
+                    href={"#" + data.name + "C"}
+                    aria-expanded="false"
+                    aria-controls={data.name + "C"}
+                  >
+                    {data.name}
+                  </a>
+                </p>
+
+              </div>
+
+              <div
+                id={data.name + "C"}
+                className="collapse hide"
+                role="tabpanel"
+                aria-labelledby={data.index}
+              >
+                <div className="card-block">
+                  {data.inIt}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="btn btn-danger"
+          data-toggle="modal"
+          data-target="#myModal2"
+        >
+          Delete A Recipe
+        </button>
+
+        <div
+          className="modal fade"
+          id="myModal2"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myModalLabel"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 className="modal-title" id="myModalLabel" />
+              </div>
+              <div className="modal-body">
+
+                <DeleteButtons removeRec={this._delRec} reci={reci} />
+
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="modal fade"
+          id="myModal3"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="myModalLabel"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+                <h4 className="modal-title" id="myModalLabel" />
+              </div>
+              <div className="modal-body">
+
+                <EditForm editor={this.editor} reci={reci} />
+
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <Credits />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById("App"));

@@ -1,0 +1,36 @@
+.btn {
+  font-family: 'Barrio', cursive;
+  font-size: 4vw;
+}
+h2 {
+  font-size: 15vw;
+}
+body{ 
+  text-align: center;
+  font-family: 'Amatic SC', cursive;
+  font-size: 4vh;
+  background-color:#b1ccc7;
+  }
+div {
+  padding: 2px;
+}
+.credit {
+  font-family: 'Pacifico', cursive;
+  width: 160px;
+  margin-left:auto;
+  margin-right:auto;
+  border: 3px solid green;
+  margin-top: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 70%;
+  -webkit-transition: -webkit-transform .8s ease-in-out;
+          transition:         transform .8s ease-in-out;
+}
+.credit:hover {
+  
+  -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+  border: 3px solid yellow;
+  color: blue;
+}
